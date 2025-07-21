@@ -1,0 +1,48 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1>Vendor Dashboard</h1>
+        <p>Welcome back, {{ vendorId }}</p>
+      </div>
+      <div class="header-right">
+        <button class="profile-button" (click)="navigateToProfile()">
+          👤 Profile
+        </button>
+        <button class="logout-button" (click)="onLogout()">
+          🚪 Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-content">
+      <div class="section-header">
+        <h2>Business Objects</h2>
+        <p>Click on any tile to view detailed information</p>
+      </div>
+
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+
+      <div class="tiles-grid" *ngIf="!isLoading">
+        <div 
+          class="tile-card" 
+          *ngFor="let tile of tiles"
+          (click)="onTileClick(tile)"
+          [style.--tile-color]="tile.color"
+        >
+          <div class="tile-icon">{{ tile.icon }}</div>
+          <div class="tile-content">
+            <h3>{{ tile.title }}</h3>
+            <div class="tile-count">{{ tile.count }}</div>
+            <div class="tile-action">View Details →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
