@@ -1,4 +1,3 @@
-// vendorPdfRoute.js
 const express = require('express');
 const axios = require('axios');
 const xml2js = require('xml2js');
@@ -15,6 +14,7 @@ const agent = new https.Agent({ rejectUnauthorized: false });
 
 router.get('/:belnr', async (req, res) => {
   const { belnr } = req.params;
+  console.log('Requested BELNR:', belnr); // Log the requested belnr
   const url = `${baseURL}${servicePath}('${belnr}')`;
 
   try {
@@ -37,15 +37,23 @@ router.get('/:belnr', async (req, res) => {
       }
 
       try {
-        const pdfBase64 =
-          result['entry']['content']['m:properties']['d:Pdfdata'];
+        const pdfBase64 = result['entry']['content']['m:properties']['d:Pdfdata'];
+        console.log('PDF Base64 length:', pdfBase64 ? pdfBase64.length : 'No PDF data'); // Log PDF length
+        const pdfBuffer = Buffer.from(pdfBase64, 'base64');
 
-        res.status(200).json({
-          belnr,
-          pdfData: pdfBase64,
+        res.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename=Invoice_${belnr}.pdf`,
+          'Content-Length': pdfBuffer.length,
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
         });
+
+        return res.send(pdfBuffer);
       } catch (extractError) {
-        res.status(500).json({
+        return res.status(500).json({
           message: 'Failed to extract PDF data',
           error: extractError,
           raw: result,
