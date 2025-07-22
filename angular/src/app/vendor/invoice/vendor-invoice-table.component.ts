@@ -23,28 +23,57 @@ export class VendorInvoiceTableComponent implements OnInit {
 
   ngOnInit(): void {
     const vendorId = this.vendorService.getCurrentVendorId();
-    
+
     if (!vendorId) {
       this.router.navigate(['/vendor/login']);
       return;
     }
 
-    this.loadGoodsReceipts();
+    this.loadInvoices();
   }
 
-  loadGoodsReceipts(): void {
+  loadInvoices(): void {
     this.vendorService.getInvoice().subscribe({
       next: (invs) => {
         this.invs = invs;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading Goods Receipts:', error);
-        this.error = 'Failed to load Goods Receipt data';
+        console.error('Error loading Invoices:', error);
+        this.error = 'Failed to load Invoice data';
         this.isLoading = false;
       }
     });
   }
+
+  formatDate(odataDate: string): string {
+    const timestamp = parseInt(odataDate.replace(/[^0-9]/g, ''), 10);
+    const date = new Date(timestamp);
+    return date.toLocaleDateString();
+  }
+downloadPDF(belnr: string): void {
+  const apiUrl = `http://localhost:5000/api/vendor/invoice-pdf/${belnr}`;
+
+  fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Invalid response or PDF not returned. Status: ${response.status}`);
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Invoice_${belnr}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      console.error('PDF download error:', error);
+      alert('Failed to download PDF.');
+    });
+}
 
   goBack(): void {
     this.router.navigate(['/vendor/dashboard']);
@@ -56,11 +85,6 @@ export class VendorInvoiceTableComponent implements OnInit {
       case 'pending': return 'status-pending';
       case 'partial': return 'status-partial';
       default: return '';
-    } 
-  }
-   formatDate(odataDate: string): string {
-    const timestamp = parseInt(odataDate.replace(/[^0-9]/g, ''), 10);
-    const date = new Date(timestamp);
-    return date.toLocaleDateString();
+    }
   }
 }

@@ -1,36 +1,35 @@
-<div class="gr-container">
-  <h2 class="title">Invoice Details</h2>
-
-  <table *ngIf="invs.length > 0; else noInvoice" class="gr-table">
-    <thead>
-      <tr>
-        <th>Invoice No</th>
-        <th>Invoice Date</th>
-        <th>Fiscal Year</th>
-        <th>Currency</th>
-        <th>Amount</th>
-        <th>Vendor Code</th>
-        <th>Vendor Name</th>
-        <th>Material</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let invoice of invs">
-        <td>{{ invoice.Belnr }}</td>
-        <td>{{ formatDate(invoice.Budat) }}</td>
-        <td>{{ invoice.Gjahr }}</td>
-        <td>{{ invoice.Waers }}</td>
-        <td>{{ invoice.Wrbtr }}</td>
-        <td>{{ invoice.Lifnr }}</td>
-        <td>{{ invoice.Name1 }}</td>
-        <td>{{ invoice.Matnr }}</td>
-        <td>{{ invoice.Txz01 }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <ng-template #noInvoice>
-    <p class="no-data">No Invoice records found.</p>
-  </ng-template>
-</div>
+<table *ngIf="invs.length > 0; else noInvoice" class="gr-table">
+  <thead>
+    <tr>
+      <th>BELNR</th>
+      <th>Date</th>
+      <th>Year</th>
+      <th>Currency</th>
+      <th>Amount</th>
+      <th>Vendor</th>
+      <th>Material</th>
+      <th>Description</th>
+      <th>Name</th>
+      <th>Download</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let inv of invs">
+      <td>{{ inv.Belnr }}</td>
+      <td>{{ formatDate(inv.Budat) }}</td>
+      <td>{{ inv.Gjahr }}</td>
+      <td>{{ inv.Waers }}</td>
+      <td>{{ inv.Wrbtr }}</td>
+      <td>{{ inv.Lifnr }}</td>
+      <td>{{ inv.Matnr }}</td>
+      <td>{{ inv.Txz01 }}</td>
+      <td>{{ inv.Name1 }}</td>
+      <td>
+        <button (click)="downloadPDF(inv.Belnr)">Download PDF</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ng-template #noInvoice>
+  <div>No invoices found.</div>
+</ng-template>
